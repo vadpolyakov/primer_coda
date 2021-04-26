@@ -4,7 +4,7 @@ using UnityEngine.Tilemaps;
 
 namespace GameControllers
 {
-    public class TileMapController : MonoBehaviour
+    public static class TileMapController
     {
         private enum MapTile
         {
@@ -83,21 +83,39 @@ namespace GameControllers
             public static Tile grass_tile;
             public static Tile tree_tile;
 
+            public static MapTile GetMapTileType(Vector3Int pos)
+            {
+                float height = Mathf.PerlinNoise(pos.x, pos.z);
+                if (height >= GameStaticValues.MapGeneration.MaxGrassHeight)
+                    return MapTile.Tree;
+                if (height <= GameStaticValues.MapGeneration.MinGrassHeigh)
+                    return MapTile.Water;
+                return MapTile.Grass;
+            }
+
             public struct Water
             {
                 public static Tile Main;
+                public static Tile Left;
                 public static Tile LeftTop;
                 public static Tile LeftBot;
+                public static Tile Right;
                 public static Tile RightTop;
                 public static Tile RightBot;
+                public static Tile Top;
+                public static Tile Bot;
 
                 public static void Load()
                 {
-                    Main = Resources.Load<Tile>("Tiles/Water/water_main");
-                    LeftTop = Resources.Load<Tile>("Tiles/Water/water_left_top");
-                    LeftBot = Resources.Load<Tile>("Tiles/Water/water_left_bot");
-                    RightTop = Resources.Load<Tile>("Tiles/Water/water_right_top");
-                    RightBot = Resources.Load<Tile>("Tiles/Water/water_right_bot");
+                    Main = Resources.Load<Tile>(GameStaticValues.Path.WaterTiles + "/water_main");
+                    Left = Resources.Load<Tile>(GameStaticValues.Path.WaterTiles + "/water_left");
+                    LeftTop = Resources.Load<Tile>(GameStaticValues.Path.WaterTiles + "/water_left_top");
+                    LeftBot = Resources.Load<Tile>(GameStaticValues.Path.WaterTiles + "/water_left_bot");
+                    Right = Resources.Load<Tile>(GameStaticValues.Path.WaterTiles + "/water_right");
+                    RightTop = Resources.Load<Tile>(GameStaticValues.Path.WaterTiles + "/water_right_top");
+                    RightBot = Resources.Load<Tile>(GameStaticValues.Path.WaterTiles + "/water_right_bot");
+                    Top = Resources.Load<Tile>(GameStaticValues.Path.WaterTiles + "/water_top");
+                    Bot = Resources.Load<Tile>(GameStaticValues.Path.WaterTiles + "/water_bot");
                 }
             }
 
@@ -126,20 +144,20 @@ namespace GameControllers
 
                 public static void Load()
                 {
-                    Single = Resources.Load<Tile>("Tiles/Road/road_single");
-                    TwoSide.Horizontal = Resources.Load<Tile>("Tiles/Road/road_horizontal");
-                    TwoSide.HorizontalLast = Resources.Load<Tile>("Tiles/Road/road_horizontal_last");
-                    TwoSide.Vertical = Resources.Load<Tile>("Tiles/Road/road_vertical");
-                    TwoSide.VerticalLast = Resources.Load<Tile>("Tiles/Road/road_vertical_last");
-                    TwoSide.LeftTop = Resources.Load<Tile>("Tiles/Road/road_left_top");
-                    TwoSide.LeftBot = Resources.Load<Tile>("Tiles/Road/road_left_bot");
-                    TwoSide.RightTop = Resources.Load<Tile>("Tiles/Road/road_right_top");
-                    TwoSide.RightBot = Resources.Load<Tile>("Tiles/Road/road_right_bot");
-                    ThreeSide.Left = Resources.Load<Tile>("Tiles/Road/road_t_left");
-                    ThreeSide.Right = Resources.Load<Tile>("Tiles/Road/road_t_right");
-                    ThreeSide.Top = Resources.Load<Tile>("Tiles/Road/road_t_top");
-                    ThreeSide.Bot = Resources.Load<Tile>("Tiles/Road/road_t_bot");
-                    FourSide = Resources.Load<Tile>("Tiles/Road/road_four_side");
+                    Single = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_single");
+                    TwoSide.Horizontal = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_horizontal");
+                    TwoSide.HorizontalLast = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_horizontal_last");
+                    TwoSide.Vertical = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_vertical");
+                    TwoSide.VerticalLast = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_vertical_last");
+                    TwoSide.LeftTop = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_left_top");
+                    TwoSide.LeftBot = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_left_bot");
+                    TwoSide.RightTop = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_right_top");
+                    TwoSide.RightBot = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_right_bot");
+                    ThreeSide.Left = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_t_left");
+                    ThreeSide.Right = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_t_right");
+                    ThreeSide.Top = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_t_top");
+                    ThreeSide.Bot = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_t_bot");
+                    FourSide = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_four_side");
                 }
 
                 public static RoadType GetType(Tile tile)
@@ -312,11 +330,56 @@ namespace GameControllers
         {
             Tilemaps.add_road_map.SetTile(pos, Tiles.Road.GetTile(type));
         }
+
         private static void SetWaterTile(Vector3Int pos)
         {
+            MapTile left = Tiles.GetMapTileType(pos + Vector3Int.left);
+            MapTile right = Tiles.GetMapTileType(pos + Vector3Int.right);
+            MapTile top = Tiles.GetMapTileType(pos + new Vector3Int(0, 0, 1));
+            MapTile bot = Tiles.GetMapTileType(pos + new Vector3Int(0, 0, -1));
 
+            if (left != MapTile.Water)
+            {
+                if (top != MapTile.Water)
+                {
+                    Tilemaps.ground_map.SetTile(pos, Tiles.Water.LeftTop);
+                    return;
+                }
+                if (bot != MapTile.Water)
+                {
+                    Tilemaps.ground_map.SetTile(pos, Tiles.Water.LeftBot);
+                    return;
+                }
+                Tilemaps.ground_map.SetTile(pos, Tiles.Water.Left);
+                return;
+            }
+            if (right != MapTile.Water)
+            {
+                if (top != MapTile.Water)
+                {
+                    Tilemaps.ground_map.SetTile(pos, Tiles.Water.RightTop);
+                    return;
+                }
+                if (bot != MapTile.Water)
+                {
+                    Tilemaps.ground_map.SetTile(pos, Tiles.Water.RightBot);
+                    return;
+                }
+                Tilemaps.ground_map.SetTile(pos, Tiles.Water.Right);
+                return;
+            }
+            if(top != MapTile.Water)
+            {
+                Tilemaps.ground_map.SetTile(pos, Tiles.Water.Top);
+                return;
+            }
+            if(bot != MapTile.Water)
+            {
+                Tilemaps.ground_map.SetTile(pos, Tiles.Water.Bot);
+                return;
+            }
+            Tilemaps.ground_map.SetTile(pos, Tiles.Water.Main);
         }
-
         public static void Start()
         {
             GameHelpers.InReady.TileMapControllerReady = false;
@@ -332,18 +395,19 @@ namespace GameControllers
             for(int x = -100; x <= 100; x++)
                 for(int z = -100; z <= 100; z++)
                 {
-                    float height = Mathf.PerlinNoise(x, z);
-                    if(height >= .76f)
+                    MapTile tile = Tiles.GetMapTileType(new Vector3Int(x, 0, z));
+                    switch(tile)
                     {
-                        Tilemaps.ground_map.SetTile(new Vector3Int(x, 0, z), Tiles.tree_tile);
-                        continue;
-                    }
-                    if(height <= .24)
-                    {
-                        SetWaterTile(new Vector3Int(x, 0, z));
-                        continue;
-                    }
-                    Tilemaps.ground_map.SetTile(new Vector3Int(x, 0, z), Tiles.grass_tile);
+                        case MapTile.Grass:
+                            Tilemaps.ground_map.SetTile(new Vector3Int(x, 0, z), Tiles.grass_tile);
+                            continue;
+                        case MapTile.Tree:
+                            Tilemaps.ground_map.SetTile(new Vector3Int(x, 0, z), Tiles.tree_tile);
+                            continue;
+                        case MapTile.Water:
+                            SetWaterTile(new Vector3Int(x, 0, z));
+                            continue;
+                    }                    
                 }
         }
 

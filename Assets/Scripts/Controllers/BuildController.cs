@@ -1,10 +1,39 @@
 ﻿using GameParametrs;
 using GameVariables;
+using System.Collections.Generic;
 using UnityEngine;
 namespace GameControllers
 {
-    public class BuildController : MonoBehaviour
+    public static class BuildController
     {
+        public static List<BuildParametr> AllBuilds;
+        
+        public static void LoadBuild()
+        {
+            GameHelpers.InReady.BuildsReady = false;
+
+            var all_builds = Resources.LoadAll<BuildParametr>(GameStaticValues.Path.Builds);
+            AllBuilds = new List<BuildParametr>();
+
+            while(true)
+            {
+                double cost = -1;
+                BuildParametr build = null;
+                foreach(var b in all_builds)
+                {
+                    if((b.Cost < cost || cost == -1) && !AllBuilds.Contains(b))
+                    {
+                        cost = b.StartCost;
+                        build = b;
+                    }
+                }
+                if (build == null)
+                    break;
+                AllBuilds.Add(build);
+            }
+            GameHelpers.InReady.BuildsReady = true;
+        }
+
         public static void BuyBuild(BuildParametr build)
         {
             if (build.Cost > Money.MoneyValue)
