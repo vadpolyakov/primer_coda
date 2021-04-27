@@ -6,6 +6,7 @@ namespace GameControllers
 {
     public static class TileMapController
     {
+        public static BoundsInt MapBounds;
         private enum MapTile
         {
             Grass,
@@ -21,19 +22,19 @@ namespace GameControllers
 
         private enum RoadType
         {
-            None,
-            Single,
-            Vertical,
-            Horizontal,
-            LeftTop,
-            LeftBot,
-            RightTop,
-            RightBot,
-            TLeft,
-            TRight,
-            TTop,
-            TBot,
-            Four
+            None = 0,
+            Single = 1,
+            Vertical = 2,
+            Horizontal = 3,
+            LeftTop = 4,
+            LeftBot = 5,
+            RightTop = 6,
+            RightBot = 7,
+            TLeft = 8,
+            TRight = 9,
+            TTop = 10,
+            TBot = 11,
+            Four = 12
         }
 
         private struct Tilemaps
@@ -413,11 +414,8 @@ namespace GameControllers
 
         
 
-        public static bool AddBuild(Vector3 mouseWorldPos, GameParametrs.BuildParametr build)
+        public static bool AddBuild(Vector3Int pos, GameParametrs.BuildParametr build)
         {
-            Vector3Int grid_pos = Tilemaps.grid.WorldToCell(mouseWorldPos);
-            Vector3Int pos = new Vector3Int(grid_pos.x, grid_pos.y, 0);
-
             if (!can_build(pos))
                 return false;
 
@@ -437,6 +435,51 @@ namespace GameControllers
         {
             Vector3Int grid_pos = Tilemaps.grid.WorldToCell(mouseWorldPos);
             Vector3Int pos = new Vector3Int(grid_pos.x, grid_pos.y, 0);
+        }
+
+        public static Tilemap GetTileMap(bool isBuildings)
+        {
+            if (isBuildings)
+                return Tilemaps.objects_map;
+            else
+                return Tilemaps.road_map;
+        }
+
+        public static int GetRoadIndex(Vector3Int pos)
+        {
+            return (int)Tiles.Road.GetType(pos);
+        }
+
+        public static void SetRoadIndex(Vector3Int pos, int ID)
+        {
+            Tilemaps.road_map.SetTile(pos, Tiles.Road.GetTile((RoadType)ID));
+        }
+
+        public static GameParametrs.BuildParametr GetBuild(Vector3Int pos)
+        {
+            Tile tile = Tilemaps.objects_map.GetTile<Tile>(pos);
+            if (tile == null)
+                return null;
+            foreach (var b in GameControllers.BuildController.AllBuilds)
+                if (b.BuildTile == tile)
+                    return b;
+            return null;
+        }
+
+        public static void SetBuild(Vector3Int pos, Tile tile)
+        {
+            Tilemaps.objects_map.SetTile(pos, tile);
+        }
+
+        public static void RecalculateMapBound()
+        {
+            Tilemaps.road_map.ResizeBounds();
+            MapBounds = Tilemaps.road_map.cellBounds;
+        }
+
+        public static Vector3Int WorldToTilemapPos(Vector3 world_pos)
+        {
+            return Tilemaps.grid.LocalToCell(world_pos);
         }
     }
 }

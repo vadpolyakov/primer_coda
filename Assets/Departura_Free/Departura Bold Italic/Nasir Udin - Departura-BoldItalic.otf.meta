@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 1e6768cb7994f314b901fb18d14f44d4
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Departura
+  fontNames:
+  - Departura
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 951619f9a4244bf4da8b897c442dc096, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
