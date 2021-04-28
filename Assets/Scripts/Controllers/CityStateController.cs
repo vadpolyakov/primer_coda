@@ -15,6 +15,7 @@ namespace GameControllers
         public static List<CityStateParametr> AllStates;
 
         private static int current_state_index = -1;
+        public static int CurrentStateIndex { get { return current_state_index; } }
         public static CityStateParametr CurrentState
         {
             get { if (current_state_index == -1) return null; return AllStates[current_state_index]; }

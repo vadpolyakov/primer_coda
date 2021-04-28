@@ -16,14 +16,16 @@ namespace GameControllers
         public void Start()
         {
             BuildController.LoadBuild();
-            TileMapController.Start();
+            //TileMapController.Start();
+            ShopController.Starting();
+            UIController.Starting();
 
-            Save.LoadGameState();
-            Save.LoadBuildsAndTilemaps();
+            //Save.LoadGameState();
+            //Save.LoadBuildsAndTilemaps();
 
             RecalculateBonuses(true);
 
-            StartCoroutine(AutoSaver());
+            //StartCoroutine(AutoSaver());
         }
 
         private IEnumerator AutoSaver()

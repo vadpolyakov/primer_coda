@@ -72,7 +72,26 @@ namespace GameParametrs
 
         public Tile BuildTile;
 
+        [HideInInspector]
+        public bool CanBuy { get { return Cost <= GameVariables.Money.MoneyValue; } }
+
         [SerializeField]
         public System.Guid ID = System.Guid.NewGuid();
+
+        public CityStateParametr NeedState;
+
+        [HideInInspector]
+        public int NeedStateIndex { get { if (NeedState == null) return -1; return GameControllers.CityStateController.AllStates.IndexOf(NeedState); } }
+
+        public BuildType BuildType = BuildType.Build;
+    }
+
+    public enum BuildType
+    {
+        Build,
+        Shop,
+        Factory,
+        Other,
+        Road
     }
 }

@@ -21,6 +21,9 @@ namespace GameStaticValues
         public static double HappyPerSec = 0;
 
         public static long Humans = 0;
+
+        public static GameControllers.ShopController.ShopState ShopState = GameControllers.ShopController.ShopState.Builds;
+        public static GameControllers.ShopController.ShopFilter ShopFilter = GameControllers.ShopController.ShopFilter.PerCost;
     }
 
     public struct MapGeneration
