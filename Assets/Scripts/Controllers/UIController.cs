@@ -54,9 +54,9 @@ namespace GameControllers
 
         private void connect()
         {
-            MainButton.onClick.AddListener(delegate () { ChangeGamePanel(GamePanel.Main); Debug.Log("+++"); });
-            ShopButton.onClick.AddListener(delegate () { ChangeGamePanel(GamePanel.Shop); Debug.Log("+++"); });
-            SettingsButton.onClick.AddListener(delegate () { ChangeGamePanel(GamePanel.Settings); Debug.Log("+++"); });
+            MainButton.onClick.AddListener(delegate () { ChangeGamePanel(GamePanel.Main); });
+            ShopButton.onClick.AddListener(delegate () { ChangeGamePanel(GamePanel.Shop); });
+            SettingsButton.onClick.AddListener(delegate () { ChangeGamePanel(GamePanel.Settings); });
 
             Money.onValueChange.AddListener(delegate () { MoneyText.text = Money.MoneyString; });
             Happy.onValueChange.AddListener(delegate () { HappyText.text = Happy.HappyString; });

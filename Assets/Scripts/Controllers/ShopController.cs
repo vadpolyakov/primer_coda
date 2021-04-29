@@ -31,7 +31,7 @@ namespace GameControllers
 
         public static void SelectBuild(BuildParametr build)
         {
-
+            Debug.Log(build.Title);
         }
 
         public static void CheckBuild(BuildParametr build)
@@ -49,7 +49,7 @@ namespace GameControllers
                 items[build].CanvasGroup.alpha = 1;
                 items[build].CanvasGroup.interactable = true;
                 items[build].CanvasGroup.blocksRaycasts = true;
-                items[build].Animator.SetBool(0, build.CanBuy);
+                items[build].Animator.SetBool("Open", build.CanBuy);
             }
         }
 
