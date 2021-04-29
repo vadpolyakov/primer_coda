@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Title: TITLE
   Description: DESCRIPTION
-  NeedHumans: 100
+  NeedHumans: 10

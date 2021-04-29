@@ -15,6 +15,7 @@ namespace GameControllers
 
         public void Start()
         {
+            CityStateController.LoadStates();
             BuildController.LoadBuild();
             //TileMapController.Start();
             ShopController.Starting();
@@ -79,6 +80,11 @@ namespace GameControllers
                 Happy.HappyValue = HappyValue;
             if (HumansValue != Humans.HumansValue || start)
                 Humans.HumansValue = HumansValue;
+
+            if (start)
+            {
+                Money.MoneyValue = DefaultValues.Money;
+            }
         }
 
         private static void ShowBuildInfo(Vector3Int tilemap_pos)

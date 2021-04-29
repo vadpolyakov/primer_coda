@@ -66,6 +66,10 @@ namespace GameControllers
         {
             GameHelpers.InReady.CityStateReady = false;
 
+            AllStates = new List<CityStateParametr>();
+
+            Humans.onValueChange.AddListener(CheckState);
+
             StatusChanged = new UnityEvent();
 
             var all_states = Resources.LoadAll<CityStateParametr>(GameStaticValues.Path.CityStates);
@@ -89,7 +93,7 @@ namespace GameControllers
 
                 AllStates.Add(parametr);
             }
-
+            CheckState();
             GameHelpers.InReady.CityStateReady = true;
         }
     }

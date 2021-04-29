@@ -29,6 +29,9 @@ namespace GameControllers
                 }
                 if (build == null)
                     break;
+
+                build.Count = 0;
+
                 AllBuilds.Add(build);
             }
             GameHelpers.InReady.BuildsReady = true;

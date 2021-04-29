@@ -30,6 +30,11 @@ namespace GameControllers
         [SerializeField]
         private Text HumansText;
 
+        [SerializeField]
+        private Image[] CityStateSlider;
+        [SerializeField]
+        private Text CityStateText;
+
         public static GamePanel Game_Panel = GamePanel.Main;
 
         public static void ChangeMainState(GameStatus status)
@@ -60,9 +65,23 @@ namespace GameControllers
 
             Money.onValueChange.AddListener(delegate () { MoneyText.text = Money.MoneyString; });
             Happy.onValueChange.AddListener(delegate () { HappyText.text = Happy.HappyString; });
-            Humans.onValueChange.AddListener(delegate () { HumansText.text = Humans.HappyString; });
+            Humans.onValueChange.AddListener(delegate () { HumansText.text = Humans.HappyString; check_city_state(); });
+
+            //CityStateController.StatusChanged.AddListener(delegate() { CityStateText.text = CityStateController.CurrentState.Title; check_city_state(); });
+            //CityStateText.text = CityStateController.CurrentState.Title;
+            check_city_state();
 
             ChangeGamePanel(GamePanel.Main);
+        }
+
+        private void check_city_state()
+        {
+            if (CityStateController.NextState == null)
+                foreach (var img in CityStateSlider)
+                    img.fillAmount = 1f;
+            else
+                foreach (var img in CityStateSlider)
+                    img.fillAmount = Humans.HumansValue / CityStateController.NextState.NeedHumans;
         }
     }
 

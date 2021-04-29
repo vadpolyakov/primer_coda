@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using GameParametrs;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 namespace GameControllers
 {
@@ -9,6 +10,17 @@ namespace GameControllers
         private static GameObject item_prefub;
         [SerializeField]
         private Transform item_parent;
+
+        [SerializeField]
+        private Animator BuildsButtonAnim;
+        [SerializeField]
+        private Button BuildsButton;
+        [SerializeField]
+        private Animator OtherButtonAnimator;
+        [SerializeField]
+        private Button OtherButton;
+
+        private static ShopController instance;
 
         public enum ShopState
         {
@@ -31,7 +43,8 @@ namespace GameControllers
 
         public static void SelectBuild(BuildParametr build)
         {
-            Debug.Log(build.Title);
+            build.Count++;
+            Debug.Log(build.CostString);
         }
 
         public static void CheckBuild(BuildParametr build)
@@ -50,11 +63,18 @@ namespace GameControllers
                 items[build].CanvasGroup.interactable = true;
                 items[build].CanvasGroup.blocksRaycasts = true;
                 items[build].Animator.SetBool("Open", build.CanBuy);
+                items[build].Cost.text = build.CostString;
             }
         }
 
         public static void Refresh()
         {
+            instance.BuildsButton.interactable = CurrentState != ShopState.Builds;
+            instance.OtherButton.interactable = CurrentState != ShopState.Other;
+
+            instance.BuildsButtonAnim.SetBool("Selected", CurrentState == ShopState.Builds);
+            instance.OtherButtonAnimator.SetBool("Selected", CurrentState == ShopState.Other);
+
             foreach(var build in items.Keys)
                 CheckBuild(build);
         }
@@ -66,8 +86,9 @@ namespace GameControllers
                 ShopItemController controller = Instantiate<GameObject>(item_prefub, item_parent).GetComponent<ShopItemController>();
                 items.Add(build, controller);
                 controller.Generate(build);
-                CheckBuild(build);
             }
+
+            Refresh();
         }
 
         private static ShopState GetShopState(BuildType type)
@@ -85,7 +106,11 @@ namespace GameControllers
         {
             item_prefub = Resources.Load<GameObject>("UI/ShopItem");
             items = new Dictionary<BuildParametr, ShopItemController>();
-            FindObjectOfType<ShopController>().generate_builds();
+            instance = FindObjectOfType<ShopController>();
+            instance.generate_builds();
+
+            instance.BuildsButton.onClick.AddListener(delegate () { CurrentState = ShopState.Builds; });
+            instance.OtherButton.onClick.AddListener(delegate () { CurrentState = ShopState.Other; });
             BuildParametr.onUpdate.AddListener(CheckBuild);
         }
     }
