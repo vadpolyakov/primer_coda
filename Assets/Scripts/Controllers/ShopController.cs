@@ -43,7 +43,7 @@ namespace GameControllers
 
         public static void SelectBuild(BuildParametr build)
         {
-            build.Count++;
+            BuildController.BuyBuild(build);
             Debug.Log(build.CostString);
         }
 
@@ -75,7 +75,12 @@ namespace GameControllers
             instance.BuildsButtonAnim.SetBool("Selected", CurrentState == ShopState.Builds);
             instance.OtherButtonAnimator.SetBool("Selected", CurrentState == ShopState.Other);
 
-            foreach(var build in items.Keys)
+            CheckAllBuilds();
+        }
+
+        private static void CheckAllBuilds()
+        {
+            foreach (var build in items.Keys)
                 CheckBuild(build);
         }
 
@@ -112,6 +117,8 @@ namespace GameControllers
             instance.BuildsButton.onClick.AddListener(delegate () { CurrentState = ShopState.Builds; });
             instance.OtherButton.onClick.AddListener(delegate () { CurrentState = ShopState.Other; });
             BuildParametr.onUpdate.AddListener(CheckBuild);
+
+            GameVariables.Money.onValueChange.AddListener(CheckAllBuilds);
         }
     }
 }

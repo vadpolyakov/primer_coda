@@ -13,6 +13,8 @@ namespace GameControllers
 
         public static BuildParametr AddBuildSelected = null;
 
+        private static bool ready = false;
+
         public void Start()
         {
             CityStateController.LoadStates();
@@ -26,7 +28,15 @@ namespace GameControllers
 
             RecalculateBonuses(true);
 
+            ready = true;
+
             //StartCoroutine(AutoSaver());
+        }
+
+        private void Update()
+        {
+            if (ready)
+                Money.MoneyValue += (Money.MoneyPerSec + Happy.HappyPerSec) * Time.deltaTime;
         }
 
         private IEnumerator AutoSaver()
@@ -101,9 +111,9 @@ namespace GameControllers
             if (TileMapController.AddBuild(tilemap_pos, AddBuildSelected))
             {
                 BuildController.BuyBuild(AddBuildSelected);
-                RecalculateBonuses(false);
-                Save.SaveGameState();
-                Save.SaveBuildsAndTilemaps();
+                //RecalculateBonuses(false);
+                //Save.SaveGameState();
+                //Save.SaveBuildsAndTilemaps();
             }
             else
                 return;

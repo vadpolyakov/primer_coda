@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a43588c5f9011848833253df3b271cf, type: 3}
   m_Name: test_state
   m_EditorClassIdentifier: 
-  Title: TITLE
+  Title: "\u0414\u0435\u0440\u0435\u0432\u043D\u044F"
   Description: DESCRIPTION
-  NeedHumans: 10
+  NeedHumans: 0
