@@ -67,8 +67,8 @@ namespace GameControllers
             Happy.onValueChange.AddListener(delegate () { HappyText.text = Happy.HappyString; });
             Humans.onValueChange.AddListener(delegate () { HumansText.text = Humans.HappyString; check_city_state(); });
 
-            //CityStateController.StatusChanged.AddListener(delegate() { CityStateText.text = CityStateController.CurrentState.Title; check_city_state(); });
-            //CityStateText.text = CityStateController.CurrentState.Title;
+            CityStateController.StatusChanged.AddListener(delegate() { CityStateText.text = CityStateController.CurrentState.Title; check_city_state(); });
+            CityStateText.text = CityStateController.CurrentState.Title;
             check_city_state();
 
             ChangeGamePanel(GamePanel.Main);
@@ -81,7 +81,7 @@ namespace GameControllers
                     img.fillAmount = 1f;
             else
                 foreach (var img in CityStateSlider)
-                    img.fillAmount = Humans.HumansValue / CityStateController.NextState.NeedHumans;
+                    img.fillAmount = (float)Humans.HumansValue / (float)CityStateController.NextState.NeedHumans;
         }
     }
 

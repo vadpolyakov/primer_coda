@@ -44,7 +44,6 @@ namespace GameControllers
         public static void SelectBuild(BuildParametr build)
         {
             BuildController.BuyBuild(build);
-            Debug.Log(build.CostString);
         }
 
         public static void CheckBuild(BuildParametr build)

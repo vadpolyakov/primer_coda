@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Title: "\u0413\u043E\u0440\u043E\u0434"
   Description: DESCRIPTION
-  NeedHumans: 100000
+  NeedHumans: 1000

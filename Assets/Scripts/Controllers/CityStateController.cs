@@ -8,7 +8,7 @@ namespace GameControllers
 {
     public static class CityStateController
     {
-        public static UnityEvent StatusChanged;
+        public static UnityEvent StatusChanged = new UnityEvent();
 
         public static bool NeedCityStateRevard = false;
 
@@ -45,9 +45,11 @@ namespace GameControllers
             }
             if (next_state_index == -1)
                 return;
+
             if(AllStates[next_state_index].NeedHumans <= Humans.HumansValue)
             {
-                next_state_index++;
+                current_state_index++;
+
                 if (AllStates.Count > current_state_index + 1)
                     next_state_index = current_state_index + 1;
                 else
@@ -70,7 +72,7 @@ namespace GameControllers
 
             Humans.onValueChange.AddListener(CheckState);
 
-            StatusChanged = new UnityEvent();
+            //StatusChanged = new UnityEvent();
 
             var all_states = Resources.LoadAll<CityStateParametr>(GameStaticValues.Path.CityStates);
 
@@ -93,6 +95,7 @@ namespace GameControllers
 
                 AllStates.Add(parametr);
             }
+
             CheckState();
             GameHelpers.InReady.CityStateReady = true;
         }
