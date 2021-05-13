@@ -30,6 +30,10 @@ namespace GameStaticValues
     {
         public static float MinGrassHeigh = .24f;
         public static float MaxGrassHeight = .76f;
+
+        public static float NewRoadChance = 1f;
+        public static float RoadAngleMinDistance = 5f;
+        public static float RoadAngleChance = 35f;
     }
 
     public struct Path

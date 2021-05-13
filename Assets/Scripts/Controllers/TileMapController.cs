@@ -44,13 +44,7 @@ namespace GameControllers
             public static Tilemap ground_map;
 
             public static Tilemap objects_map;
-            public static Tilemap add_objects_map;
-
-            public static Tilemap objects_map_reverse;
-            public static Tilemap add_objects_map_reverse;
-
             public static Tilemap road_map;
-            public static Tilemap add_road_map;
 
             public static void FindObjects()
             {
@@ -62,20 +56,8 @@ namespace GameControllers
                 objects_map = GameObject.Find("objects_map").GetComponent<Tilemap>();
                 objects_map.ClearAllTiles();
 
-                add_objects_map = GameObject.Find("add_objects_map").GetComponent<Tilemap>();
-                add_objects_map.ClearAllTiles();
-
-                objects_map_reverse = GameObject.Find("objects_map_reverse").GetComponent<Tilemap>();
-                objects_map_reverse.ClearAllTiles();
-
-                add_objects_map_reverse = GameObject.Find("add_objects_map_reverse").GetComponent<Tilemap>();
-                add_objects_map_reverse.ClearAllTiles();
-
                 road_map = GameObject.Find("road_map").GetComponent<Tilemap>();
                 road_map.ClearAllTiles();
-
-                add_road_map = GameObject.Find("add_road_map").GetComponent<Tilemap>();
-                add_road_map.ClearAllTiles();
             }
         }
 
@@ -180,18 +162,10 @@ namespace GameControllers
 
                 public static RoadType GetType(Vector3Int position, bool correct = false)
                 {
-                    RoadType left = GetType(Tilemaps.add_road_map.GetTile<Tile>(position + Vector3Int.left));
-                    if(left == RoadType.None)
-                        left = GetType(Tilemaps.road_map.GetTile<Tile>(position + Vector3Int.left));
-                    RoadType right = GetType(Tilemaps.add_road_map.GetTile<Tile>(position + Vector3Int.right));
-                    if(right == RoadType.None)
-                        right = GetType(Tilemaps.road_map.GetTile<Tile>(position + Vector3Int.right));
-                    RoadType top = GetType(Tilemaps.add_road_map.GetTile<Tile>(position + Vector3Int.up));
-                    if(top == RoadType.None)
-                        top = GetType(Tilemaps.road_map.GetTile<Tile>(position + Vector3Int.up));
-                    RoadType bot = GetType(Tilemaps.add_road_map.GetTile<Tile>(position + Vector3Int.down));
-                    if(bot == RoadType.None)
-                        bot = GetType(Tilemaps.road_map.GetTile<Tile>(position + Vector3Int.down));
+                    RoadType left = GetType(Tilemaps.road_map.GetTile<Tile>(position + Vector3Int.left));
+                    RoadType right = GetType(Tilemaps.road_map.GetTile<Tile>(position + Vector3Int.right));
+                    RoadType top = GetType(Tilemaps.road_map.GetTile<Tile>(position + Vector3Int.up));
+                    RoadType bot = GetType(Tilemaps.road_map.GetTile<Tile>(position + Vector3Int.down));
 
                     int sideCount = 0;
                     if (left != RoadType.None)
@@ -319,17 +293,16 @@ namespace GameControllers
 
         }
 
-        private static bool can_build(Vector3Int pos)
+        public static bool can_build(Vector3Int pos)
         {
-            return !Tilemaps.add_road_map.HasTile(pos) && !Tilemaps.road_map.HasTile(pos)
+            return !Tilemaps.road_map.HasTile(pos)
                 && Tilemaps.ground_map.GetTile<Tile>(pos) == Tiles.grass_tile
-                && !Tilemaps.objects_map.HasTile(pos) && !Tilemaps.objects_map_reverse.HasTile(-pos)
-                && !Tilemaps.add_objects_map.HasTile(pos) && !Tilemaps.add_objects_map_reverse.HasTile(-pos);
+                && !Tilemaps.objects_map.HasTile(pos);
         }
 
         private static void SetRoadTile(Vector3Int pos, RoadType type)
         {
-            Tilemaps.add_road_map.SetTile(pos, Tiles.Road.GetTile(type));
+            Tilemaps.road_map.SetTile(pos, Tiles.Road.GetTile(type));
         }
 
         private static void SetWaterTile(Vector3Int pos)
@@ -419,16 +392,14 @@ namespace GameControllers
             if (!can_build(pos))
                 return false;
 
-            Tilemaps.add_objects_map.SetTile(pos, build.BuildTile);
+            Tilemaps.objects_map.SetTile(pos, build.BuildTile);
 
             return true;
         }
 
-        public static void AddRoad(Vector3 mouseWorldPos)
+        public static void AddRoad(Vector3Int roadPos)
         {
-            Vector3Int grid_pos = Tilemaps.grid.WorldToCell(mouseWorldPos);
-            Vector3Int pos = new Vector3Int(grid_pos.x, grid_pos.y, 0);
-            SetRoadTile(pos, Tiles.Road.GetType(pos, true));
+            SetRoadTile(roadPos, Tiles.Road.GetType(roadPos, true));
         }
 
         public static void ReverseBuild(Vector3 mouseWorldPos)
