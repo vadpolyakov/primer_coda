@@ -19,7 +19,7 @@ namespace GameControllers
         {
             CityStateController.LoadStates();
             BuildController.LoadBuild();
-            //TileMapController.Start();
+            TileMapController.Start();
             ShopController.Starting();
             UIController.Starting();
 

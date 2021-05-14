@@ -68,7 +68,8 @@ namespace GameControllers
 
             public static MapTile GetMapTileType(Vector3Int pos)
             {
-                float height = Mathf.PerlinNoise(pos.x, pos.z);
+                float height = Mathf.PerlinNoise(pos.x / 50f, pos.y / 50f);
+                //Debug.Log(pos + " = " + height);
                 if (height >= GameStaticValues.MapGeneration.MaxGrassHeight)
                     return MapTile.Tree;
                 if (height <= GameStaticValues.MapGeneration.MinGrassHeigh)
@@ -108,9 +109,9 @@ namespace GameControllers
                 public struct TwoSide
                 {
                     public static Tile Horizontal;
-                    public static Tile HorizontalLast;
+                    //public static Tile HorizontalLast;
                     public static Tile Vertical;
-                    public static Tile VerticalLast;
+                    //public static Tile VerticalLast;
                     public static Tile LeftTop;
                     public static Tile LeftBot;
                     public static Tile RightTop;
@@ -127,11 +128,11 @@ namespace GameControllers
 
                 public static void Load()
                 {
-                    Single = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_single");
+                    Single = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_horizontal");
                     TwoSide.Horizontal = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_horizontal");
-                    TwoSide.HorizontalLast = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_horizontal_last");
+                    //TwoSide.HorizontalLast = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_horizontal_last");
                     TwoSide.Vertical = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_vertical");
-                    TwoSide.VerticalLast = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_vertical_last");
+                    //TwoSide.VerticalLast = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_vertical_last");
                     TwoSide.LeftTop = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_left_top");
                     TwoSide.LeftBot = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_left_bot");
                     TwoSide.RightTop = Resources.Load<Tile>(GameStaticValues.Path.RoadTiles + "/road_right_top");
@@ -280,7 +281,7 @@ namespace GameControllers
 
             public static void Load()
             {
-                grass_tile = Resources.Load<Tile>("Tiles/Grass/Main");
+                grass_tile = Resources.Load<Tile>("Tiles/Grass/grass_main");
                 Water.Load();
                 Road.Load();
             }
@@ -309,8 +310,8 @@ namespace GameControllers
         {
             MapTile left = Tiles.GetMapTileType(pos + Vector3Int.left);
             MapTile right = Tiles.GetMapTileType(pos + Vector3Int.right);
-            MapTile top = Tiles.GetMapTileType(pos + new Vector3Int(0, 0, 1));
-            MapTile bot = Tiles.GetMapTileType(pos + new Vector3Int(0, 0, -1));
+            MapTile top = Tiles.GetMapTileType(pos + Vector3Int.up);
+            MapTile bot = Tiles.GetMapTileType(pos + Vector3Int.down);
 
             if (left != MapTile.Water)
             {
@@ -361,6 +362,8 @@ namespace GameControllers
             Tilemaps.FindObjects();
             Tiles.Load();
 
+            GenerateMap();
+
             GameHelpers.InReady.TileMapControllerReady = true;
         }
 
@@ -369,17 +372,17 @@ namespace GameControllers
             for(int x = -100; x <= 100; x++)
                 for(int z = -100; z <= 100; z++)
                 {
-                    MapTile tile = Tiles.GetMapTileType(new Vector3Int(x, 0, z));
+                    MapTile tile = Tiles.GetMapTileType(new Vector3Int(x, z, 0));
                     switch(tile)
                     {
                         case MapTile.Grass:
-                            Tilemaps.ground_map.SetTile(new Vector3Int(x, 0, z), Tiles.grass_tile);
+                            Tilemaps.ground_map.SetTile(new Vector3Int(x, z, 0), Tiles.grass_tile);
                             continue;
                         case MapTile.Tree:
-                            Tilemaps.ground_map.SetTile(new Vector3Int(x, 0, z), Tiles.tree_tile);
+                            Tilemaps.ground_map.SetTile(new Vector3Int(x, z, 0), Tiles.tree_tile);
                             continue;
                         case MapTile.Water:
-                            SetWaterTile(new Vector3Int(x, 0, z));
+                            SetWaterTile(new Vector3Int(x, z, 0));
                             continue;
                     }                    
                 }

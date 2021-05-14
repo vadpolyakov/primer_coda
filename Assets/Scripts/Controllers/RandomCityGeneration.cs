@@ -22,7 +22,9 @@ namespace GameControllers
                 AllRoads = new List<Road>();
             if (AllRoads.Count == 0)
             {
+                Debug.Log("!");
                 AllRoads.Add(new Road(Vector3Int.zero));
+                TileMapController.AddRoad(Vector3Int.zero);
                 return;
             }
 
@@ -39,17 +41,20 @@ namespace GameControllers
                         break;
                 }
                 AllRoads.Add(new Road(firstPoint, roadpos));
+                Debug.Log("+");
             }
             else
             {
                 while(true)
                 {
                     roadpos = RandomRoad.GetRandomPoint();
+                    Debug.Log("++");
                     if (TileMapController.can_build(roadpos))
                         break;
                 }
             }
             TileMapController.AddRoad(roadpos);
+            Debug.Log(roadpos);
         }
     }
 
@@ -137,7 +142,7 @@ namespace GameControllers
                 return GetRandomDirection(new List<Vector3Int> { GetNegativeDirection(points[last_index - 1], points[last_index]) });
 
             angle = false;
-            return GetPositiveDirection(points[last_index - 1], points[last_index]);
+            return GetPositiveDirection(points[last_index], points[last_index - 1]);
         }
 
         private static Vector3Int Get90DegDirection(Vector3Int fromDirection, Vector3Int toDirection)
@@ -194,7 +199,16 @@ namespace GameControllers
 
         private static Vector3Int GetRandomDirection(List<Vector3Int> block)
         {
-            return Vector3Int.zero;
+            List<Vector3Int> buffer = new List<Vector3Int>();
+            if (!block.Contains(Vector3Int.left))
+                buffer.Add(Vector3Int.left);
+            if (!block.Contains(Vector3Int.right))
+                buffer.Add(Vector3Int.right);
+            if (!block.Contains(Vector3Int.up))
+                buffer.Add(Vector3Int.up);
+            if (!block.Contains(Vector3Int.down))
+                buffer.Add(Vector3Int.down);
+            return buffer[Random.Range(0, buffer.Count - 1)];
         }
 
         public static bool Chance(float chance)
