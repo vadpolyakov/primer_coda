@@ -1,33 +1,52 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using GameStaticValues;
+using System.Collections;
+using System;
 
 namespace GameControllers
 {
     public class RandomCityGeneration : MonoBehaviour
     {
+        private static int COROUTINE_RUNNING = 0;
+
+        private static RandomCityGeneration itc;
+        private static RandomCityGeneration instance
+        {
+            get
+            {
+                if (itc == null)
+                    itc = new GameObject("RandomCityGeneration").AddComponent<RandomCityGeneration>();
+                return itc;
+            }
+        }
         private static List<Road> AllRoads;
+        private static List<Vector3Int> FreeTilesPoints = new List<Vector3Int>();
+        private static Vector3Int RandomFreeTilePos
+        {
+            get
+            {
+                return FreeTilesPoints[UnityEngine.Random.Range(0, FreeTilesPoints.Count - 1)];
+            }
+        }
 
         private static Road RandomRoad
         {
             get
             {
-                return AllRoads[Random.Range(0, AllRoads.Count - 1)];
+                return AllRoads[UnityEngine.Random.Range(0, AllRoads.Count - 1)];
             }
         }
 
-        public static void AddToRoad()
+        private static IEnumerator AddRoad()
         {
-            if (AllRoads == null)
-                AllRoads = new List<Road>();
-            if (AllRoads.Count == 0)
-            {
-                Debug.Log("!");
-                AllRoads.Add(new Road(Vector3Int.zero));
-                TileMapController.AddRoad(Vector3Int.zero);
-                return;
-            }
+            Debug.Log("COROUTINE RUNNING " + COROUTINE_RUNNING);
 
+            COROUTINE_RUNNING++;
+
+
+
+            DateTime starttime = DateTime.UtcNow;
             Vector3Int roadpos = Vector3Int.zero;
             if (Road.Chance(MapGeneration.NewRoadChance))
             {
@@ -39,22 +58,72 @@ namespace GameControllers
                     roadpos = firstPoint + direction;
                     if (TileMapController.can_build(roadpos))
                         break;
+                    if ((DateTime.UtcNow - starttime).TotalSeconds > Time.deltaTime)
+                        yield return new WaitForEndOfFrame();
                 }
                 AllRoads.Add(new Road(firstPoint, roadpos));
-                Debug.Log("+");
             }
             else
             {
-                while(true)
+                while (true)
                 {
-                    roadpos = RandomRoad.GetRandomPoint();
-                    Debug.Log("++");
+                    bool is_first = false;
+                    bool angle = false;
+                    Road r = RandomRoad;
+                    roadpos = r.GetRandomPoint(ref angle, ref is_first);
+
                     if (TileMapController.can_build(roadpos))
+                    {
+                        r.AddPoint(angle, is_first, roadpos);
                         break;
+                    }
+                    if ((DateTime.UtcNow - starttime).TotalSeconds > Time.deltaTime)
+                        yield return new WaitForEndOfFrame();
                 }
             }
             TileMapController.AddRoad(roadpos);
-            Debug.Log(roadpos);
+            AddFreePos(roadpos);
+
+            COROUTINE_RUNNING--;
+
+            
+
+            yield return null;
+        }
+
+        public static void AddBuild(GameParametrs.BuildParametr build)
+        {
+            Vector3Int pos = RandomFreeTilePos;
+            TileMapController.AddBuild(pos, build);
+            FreeTilesPoints.Remove(pos);
+        }
+
+        public static void AddToRoad()
+        {
+            if (AllRoads == null)
+                AllRoads = new List<Road>();
+            if (AllRoads.Count == 0)
+            {
+                AllRoads.Add(new Road(Vector3Int.zero));
+                TileMapController.AddRoad(Vector3Int.zero);
+                AddFreePos(Vector3Int.zero);
+                return;
+            }
+
+            instance.StartCoroutine(AddRoad());
+        }
+
+        private static void AddFreePos(Vector3Int road_pos)
+        {
+            for (int x = road_pos.x - 1; x <= road_pos.x + 1; x++)
+                for (int y = road_pos.y - 1; y < road_pos.y + 1; y++)
+                {
+                    Vector3Int pos = new Vector3Int(x, y, 0);
+                    if (TileMapController.can_build(pos) && !FreeTilesPoints.Contains(pos))
+                        FreeTilesPoints.Add(pos);
+                }
+            if (FreeTilesPoints.Contains(road_pos))
+                FreeTilesPoints.Remove(road_pos);
         }
     }
 
@@ -80,46 +149,56 @@ namespace GameControllers
         {
             if(last_index <= 2)
             {
-                int index = Random.Range(0, 1);
+                int index = UnityEngine.Random.Range(0, 1);
                 direction = GetRandomDirection(new List<Vector3Int> { GetNegativeDirection(points[0], points[1]) });
                 return points[index];
             }
             else
             {
-                int index = Random.Range(1, last_index - 1);
+                int index = UnityEngine.Random.Range(1, last_index - 1);
                 direction = Get90DegDirection(GetPositiveDirection(points[index - 1], points[index]), GetPositiveDirection(points[index + 1], points[index]));
                 return points[index];
             }
         }
 
-        public Vector3Int GetRandomPoint()
+        public void AddPoint(bool angle, bool is_first, Vector3Int point)
         {
-            Vector3Int direction = Vector3Int.zero;
-            bool angle = true;
-
-            if (Chance(50f))
+            if (is_first)
             {
-                direction = back_point(ref angle);
                 if (angle)
                 {
-                    List<Vector3Int> buffer = new List<Vector3Int> { points[0] - direction };
+                    List<Vector3Int> buffer = new List<Vector3Int> { point };
                     buffer.AddRange(points);
                     points = buffer;
                 }
                 else
-                    points[0] -= direction;
+                    points[0] = point;
+            }
+            else
+            {
+                if (angle)
+                    points.Add(point);
+                else
+                    points[last_index] = point;
+            }
+        }
 
-                return points[0];
+        public Vector3Int GetRandomPoint(ref bool angle, ref bool is_first)
+        {
+            Vector3Int direction = Vector3Int.zero;
+            angle = true;
+
+            if (Chance(50f))
+            {
+                direction = back_point(ref angle);
+                is_first = true;
+                return points[0] -= direction;
             }
             else
             {
                 direction = next_point(ref angle);
-                if (angle)
-                    points.Add(points[last_index] + direction);
-                else
-                    points[last_index] += direction;
-
-                return points[last_index];
+                is_first = false;
+                return points[last_index] + direction;
             }
         }
 
@@ -208,12 +287,12 @@ namespace GameControllers
                 buffer.Add(Vector3Int.up);
             if (!block.Contains(Vector3Int.down))
                 buffer.Add(Vector3Int.down);
-            return buffer[Random.Range(0, buffer.Count - 1)];
+            return buffer[UnityEngine.Random.Range(0, buffer.Count - 1)];
         }
 
         public static bool Chance(float chance)
         {
-            float value = Random.Range(0f, 100f);
+            float value = UnityEngine.Random.Range(0f, 100f);
             if (value > chance)
                 return false;
             else

@@ -46,6 +46,8 @@ namespace GameControllers
             BuildController.BuyBuild(build);
             if (build.BuildType == BuildType.Road)
                 RandomCityGeneration.AddToRoad();
+            else
+                RandomCityGeneration.AddBuild(build);
         }
 
         public static void CheckBuild(BuildParametr build)
