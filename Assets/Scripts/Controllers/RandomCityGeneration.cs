@@ -40,7 +40,7 @@ namespace GameControllers
 
         private static IEnumerator AddRoad()
         {
-            Debug.Log("COROUTINE RUNNING " + COROUTINE_RUNNING);
+            Debug.Log("<color=yellow>COROUTINE RUNNING</color> " + COROUTINE_RUNNING);
 
             COROUTINE_RUNNING++;
 
@@ -129,10 +129,11 @@ namespace GameControllers
 
     public class Road
     {
+        #region Variables
         private bool firstIsEmpty = true;
         private List<Vector3Int> points;
         private int last_index { get { return points.Count - 1; } }
-
+        #endregion
         public Road(Vector3Int point)
         {
             points = new List<Vector3Int> { point };
@@ -223,7 +224,7 @@ namespace GameControllers
             angle = false;
             return GetPositiveDirection(points[last_index], points[last_index - 1]);
         }
-
+        #region Directions
         private static Vector3Int Get90DegDirection(Vector3Int fromDirection, Vector3Int toDirection)
         {
             if(fromDirection == Vector3Int.left || fromDirection == Vector3Int.right)
@@ -275,7 +276,6 @@ namespace GameControllers
                     return Vector3Int.right;
             }
         }
-
         private static Vector3Int GetRandomDirection(List<Vector3Int> block)
         {
             List<Vector3Int> buffer = new List<Vector3Int>();
@@ -289,16 +289,6 @@ namespace GameControllers
                 buffer.Add(Vector3Int.down);
             return buffer[UnityEngine.Random.Range(0, buffer.Count - 1)];
         }
-
-        public static bool Chance(float chance)
-        {
-            float value = UnityEngine.Random.Range(0f, 100f);
-            if (value > chance)
-                return false;
-            else
-                return true;
-        }
-
         private static Vector3Int GetNegativeDirection(Vector3Int point1, Vector3Int point2)
         {
             return ConvertToVector3Int(-((Vector3)point1 - (Vector3)point2).normalized);
@@ -310,6 +300,15 @@ namespace GameControllers
         private static Vector3Int ConvertToVector3Int(Vector3 v3)
         {
             return new Vector3Int((int)v3.x, (int)v3.y, (int)v3.z);
+        }
+        #endregion
+        public static bool Chance(float chance)
+        {
+            float value = UnityEngine.Random.Range(0f, 100f);
+            if (value > chance)
+                return false;
+            else
+                return true;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿public class Settings { }
+
 namespace GameStaticValues
 {
     public struct Symbols
